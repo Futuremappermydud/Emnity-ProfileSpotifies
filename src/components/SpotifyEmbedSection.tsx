@@ -11,15 +11,16 @@ export default ({ userId }: { userId: string }) => {
     const profile = UserProfileStore.getUserProfile(userId);
     if (!profile)
         return null;
-    let bio : string = profile?.bio;
+    let bio = profile?.bio;
     if(bio?.includes('spotify:'))
     {
-        let str = profile?.bio?.split('spotify:')?.pop()?.split(':')[0]?.replace(" ", "");
-        let result = str?.split(/[,:]/);
+        let str = bio?.split('spotify:').pop().split(':')[0]
+        let result = str.split(/[,:]/).map((x: string) => x.replace(" ", ""));
 
         let spotifylinks = result?.map((value : string) =>
             "https://open.spotify.com/embed/" + value
         );
+        
         if(spotifylinks?.length > 0)
         {
             return <UserProfileSection title={"Spotify Pinned"}>
