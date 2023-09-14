@@ -11,28 +11,29 @@ export default ({ userId }: { userId: string }) => {
     const profile = UserProfileStore.getUserProfile(userId);
     if (!profile)
         return null;
-    console.log(profile.bio);
-    const match = profile.bio.match(/\b((https?|ftp|file):\/\/|(www|ftp)\.)[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/ig);
-    console.log(match);
-    let spotifylinks = match.filter((value : string) =>
-        value.startsWith("https://open.spotify.com/") || value.startsWith("http://open.spotify.com/")
-    );
-    console.log(spotifylinks);
-    spotifylinks = spotifylinks.map((value : string) =>
-        value.replace("open.spotify.com/", "open.spotify.com/embed/")
-    );
-    console.log(spotifylinks);
+    let bio : string = profile?.bio;
+    if(bio?.includes('spotify:'))
+    {
+        let str = profile?.bio?.split('spotify:')?.pop()?.split(':')[0]?.replace(" ", "");
+        let result = str?.split(/[,:]/);
 
-    return <UserProfileSection title={"Spotify Pinned"}>
-        <ScrollView style={{ flexDirection: 'column' }}>
-            {
-                spotifylinks.map((value : string, index : number) => {
-                    return ( <WebView
-                    source={{ uri: value }}
-                    style={{ marginTop: index === 0 ? 0 : 5, backgroundColor: "#00000000", height: 80, width: "100%" }}
-                    /> );
-                })
-            }
-        </ScrollView>
-    </UserProfileSection>
+        let spotifylinks = result?.map((value : string) =>
+            "https://open.spotify.com/embed/" + value
+        );
+        if(spotifylinks?.length > 0)
+        {
+            return <UserProfileSection title={"Spotify Pinned"}>
+                <ScrollView style={{ flexDirection: 'column' }}>
+                    {
+                        spotifylinks?.map((value : string, index : number) => {
+                            return ( <WebView
+                            source={{ uri: value }}
+                            style={{ marginTop: index === 0 ? 0 : 8, backgroundColor: "#00000000", height: 80, width: "100%" }}
+                            /> );
+                        })
+                    }
+                </ScrollView>
+            </UserProfileSection>
+        }
+    }
 }
